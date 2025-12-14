@@ -1,104 +1,161 @@
+// =================================================================================
+// 1. CONSTANTES E SELETORES 
+// =================================================================================
+
 const convertButton = document.querySelector('.convert-button');
-
-
 const currencySelectToConvert = document.querySelector('.currency-select-to-convert');
 const currencySelectConverted = document.querySelector('.currency-select-converted');
 
-function convertValues() {
+// Elementos de Entrada/Saída
+const inputCurrency = document.querySelector('.input-currency');
+const currencyValueConvert = document.querySelector('.currency-value-to-convert');
+const currencyValueToConverted = document.querySelector('.currency-value-converted');
 
-  const inputCurrency = document.querySelector('.input-currency').value;
-  const currencyValueConvert = document.querySelector('.currency-value-to-convert');
-  const currencyValueToConverted = document.querySelector('.currency-value-converted');
-
-  const realToday = 1;
-  const dolarToday = 5.2;
-  const euroToday = 6.5;
-  const bitcoinToday = 1;
+// Elementos da Interface 
+const curencyNameToConvert = document.getElementById('currency-name-to-convert');
+const currencyName = document.getElementById('currency-name');
+const currencyImageToConvert = document.getElementById('currency-image-to-convert');
+const currencyImageConverted = document.getElementById('currency-image-converted');
 
 
-  // Convertendo de:
+// Endpoint da API 
+const API_URL = 'https://api.exchangerate-api.com/v4/latest/';
 
-  if (currencySelectToConvert.value == 'real') {
-    currencyValueConvert.innerHTML = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(inputCurrency);
 
+// =================================================================================
+// 2. ESTRUTURA DE DADOS 
+// =================================================================================
+
+const currencyData = {
+  real: {
+    name: 'Real Brasileiro',
+    locale: 'pt-BR',
+    code: 'BRL',
+    image: './assets/real.png'
+  },
+  dolar: {
+    name: 'Dólar Americano',
+    locale: 'en-US',
+    code: 'USD',
+    image: './assets/dolar.png'
+  },
+  euro: {
+    name: 'Euro',
+    locale: 'de-DE',
+    code: 'EUR',
+    image: './assets/euro.png'
+  },
+  libra: {
+    name: 'Libra Esterlina',
+    locale: 'en-GB',
+    code: 'GBP',
+    image: './assets/libra.png'
   }
-  if (currencySelectToConvert.value == 'dolar') {
-    currencyValueConvert.innerHTML = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(inputCurrency);
+};
 
+// =================================================================================
+// 3. FUNÇÃO ASSÍNCRONA PARA BUSCAR TAXAS (Requisita as taxas em tempo real)
+// =================================================================================
+
+async function fetchExchangeRates(baseCurrencyCode) {
+  try {
+    const response = await fetch(`${API_URL}${baseCurrencyCode}`);
+    if (!response.ok) {
+      throw new Error(`Falha na API: Status ${response.status}`);
+    }
+    const data = await response.json();
+    return data.rates;
+  } catch (error) {
+    console.error('Erro ao buscar taxas de câmbio:', error);
+    // Exibe uma mensagem de erro no campo de conversão
+    currencyValueToConverted.innerHTML = 'Falha na conexão com a API';
+    return null;
   }
-  if (currencySelectToConvert.value == 'euro') {
-    currencyValueConvert.innerHTML = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(inputCurrency);
-
-  }
-  if (currencySelectToConvert.value == 'bitcoin') {
-    currencyValueConvert.innerHTML = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'BTC' }).format(inputCurrency);
-  }
-
-
-
-  // Convertendo para:
-
-  if (currencySelectConverted.value == 'real') {
-    currencyValueToConverted.innerHTML = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(inputCurrency / realToday);
-
-  }
-  if (currencySelectConverted.value == 'dolar') {
-    currencyValueToConverted.innerHTML = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(inputCurrency / dolarToday);
-
-  }
-  if (currencySelectConverted.value == 'euro') {
-    currencyValueToConverted.innerHTML = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(inputCurrency / euroToday);
-
-  }
-  if (currencySelectConverted.value == 'bitcoin') {
-
-    currencyValueToConverted.innerHTML = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'BTC' }).format(inputCurrency / bitcoinToday);
-  }
-
-  currencyValueConvert;
-
-
 }
+
+
+// =================================================================================
+// 4. FUNÇÃO DE CONVERSÃO 
+// =================================================================================
+
+async function convertValues() {
+  const inputCurrencyValue = Number(inputCurrency.value);
+
+  // Obtém o código da moeda de origem e destino
+  const currencyFromKey = currencySelectToConvert.value;
+  const currencyToKey = currencySelectConverted.value;
+
+  const fromData = currencyData[currencyFromKey];
+  const toData = currencyData[currencyToKey];
+
+  // Exibe o valor de origem formatado
+  currencyValueConvert.innerHTML = new Intl.NumberFormat(fromData.locale, {
+    style: 'currency',
+    currency: fromData.code
+  }).format(inputCurrencyValue);
+
+
+  // CHAMADA DINÂMICA: Requisita a API usando a moeda de origem como base
+  const rates = await fetchExchangeRates(fromData.code);
+
+  if (rates && rates[toData.code]) {
+    // Encontra a taxa para a moeda de destino (ex: taxa do USD se a base for BRL)
+    const rate = rates[toData.code];
+    const convertedValue = inputCurrencyValue * rate;
+
+    // Exibe o valor convertido formatado
+    currencyValueToConverted.innerHTML = new Intl.NumberFormat(toData.locale, {
+      style: 'currency',
+      currency: toData.code
+    }).format(convertedValue);
+
+  } else {
+    currencyValueToConverted.innerHTML = 'Erro: Taxa não disponível';
+  }
+}
+
+
+// =================================================================================
+// 5. FUNÇÃO PARA ATUALIZAR A INTERFACE (Trocando Nomes e Imagens)
+// =================================================================================
 
 function changeCurrency() {
-  const curencyNameToConvert = document.getElementById('currency-name-to-convert');
-  const currencyName = document.getElementById('currency-name');
+  const currencyFromKey = currencySelectToConvert.value;
+  const currencyToKey = currencySelectConverted.value;
 
-  if (currencySelectToConvert.value == 'real') {
-    curencyNameToConvert.innerHTML = 'Real Brasileiro';
-  }
-  if (currencySelectToConvert.value == 'dolar') {
-    curencyNameToConvert.innerHTML = 'Dolar Americano';
-  }
-  if (currencySelectToConvert.value == 'euro') {
-    curencyNameToConvert.innerHTML = 'Euro';
-  }
-  if (currencySelectToConvert.value == 'bitcoin') {
-    curencyNameToConvert.innerHTML = 'Bitcoin';
-  }
+  const fromData = currencyData[currencyFromKey];
+  const toData = currencyData[currencyToKey];
 
+  // Atualiza nome e imagem de origem
+  curencyNameToConvert.innerHTML = fromData.name;
+  currencyImageToConvert.src = fromData.image;
 
-  // convertidos
-
-  if (currencySelectConverted.value == 'real') {
-    currencyName.innerHTML = 'Real Brasileiro';
-  }
-  if (currencySelectConverted.value == 'dolar') {
-    currencyName.innerHTML = 'Dolar Americano';
-  }
-  if (currencySelectConverted.value == 'euro') {
-    currencyName.innerHTML = 'Euro';
-  }
-  if (currencySelectConverted.value == 'bitcoin') {
-    currencyName.innerHTML = 'Bitcoin';
-  }
-
-
+  // Atualiza nome e imagem de destino
+  currencyName.innerHTML = toData.name;
+  currencyImageConverted.src = toData.image;
 }
 
-currencySelectConverted.addEventListener('change', changeCurrency);
-currencySelectToConvert.addEventListener('change', changeCurrency);
+
+// =================================================================================
+// 6. EVENT LISTENERS
+// =================================================================================
+
+// Ao trocar a moeda de destino ou origem, atualiza a interface E refaz a conversão.
+currencySelectConverted.addEventListener('change', () => {
+  changeCurrency();
+  convertValues();
+});
+
+currencySelectToConvert.addEventListener('change', () => {
+  changeCurrency();
+  convertValues();
+});
+
+// Ao clicar no botão, refaz a conversão.
 convertButton.addEventListener('click', convertValues);
 
-
-// ja configuramos a troca do nome e valores, falta a imagem. O select convertido esta funcionando porém o de converter ainda não. Estamos na aula Javascript pt.4 6:17
+// Inicializa a interface visualmente quando a página carrega
+document.addEventListener('DOMContentLoaded', () => {
+  changeCurrency();
+  // Podemos chamar convertValues() aqui se quiser um valor inicial ao carregar a página
+});
