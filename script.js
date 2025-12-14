@@ -78,8 +78,32 @@ async function fetchExchangeRates(baseCurrencyCode) {
 // 4. FUNÇÃO DE CONVERSÃO 
 // =================================================================================
 
+/**
+ * @async
+ * Realiza o cálculo da conversão, formatando a saída e buscando a taxa mais recente.
+ * O processo é totalmente dinâmico, convertendo qualquer par de moedas selecionado.
+ */
 async function convertValues() {
-  const inputCurrencyValue = Number(inputCurrency.value);
+  // 1. OBTÉM O VALOR BRUTO E TRATA A VÍRGULA
+  let rawInputValue = inputCurrency.value;
+
+  // CORREÇÃO: Substitui a vírgula (padrão brasileiro) por ponto (padrão JavaScript/inglês) 
+  // para garantir que a conversão para Number() não retorne NaN.
+  rawInputValue = rawInputValue.replace(',', '.');
+
+  // Converte o valor tratado para número
+  const inputCurrencyValue = Number(rawInputValue);
+
+  // Adição de Verificação de Segurança: Sai da função se o valor for inválido
+  if (isNaN(inputCurrencyValue) || inputCurrencyValue <= 0) {
+    currencyValueConvert.innerHTML = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(0); // Exibe zero ou o valor padrão
+
+    currencyValueToConverted.innerHTML = 'Insira um valor válido';
+    return;
+  }
 
   // Obtém o código da moeda de origem e destino
   const currencyFromKey = currencySelectToConvert.value;
