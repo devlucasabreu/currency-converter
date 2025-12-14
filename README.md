@@ -62,4 +62,4 @@ Este projeto está sob a **Licença MIT**.
 
 O projeto está hospedado e acessível publicamente no link abaixo 
 
-➡️ **LINK DE ACESSO:** `[Insira o link de deploy ativo aqui]`
+➡️ ➡️ **LINK DE ACESSO:** [devlucasabreu-currency-converter.netlify.app](https://devlucasabreu-currency-converter.netlify.app/)
