@@ -1,5 +1,9 @@
 # 💰 Currency Converter | Conversor de Moedas
 
+<p align="center">
+  <a href="https://devlucasabreu-currency-converter.netlify.app/"><strong>Acessar o Projeto Online</strong></a>
+</p>
+
 ## Visão Geral do Projeto
 
 Este projeto é um **Conversor de Moedas** moderno e responsivo, desenvolvido utilizando **HTML5**, **CSS3** e **JavaScript (Vanilla JS)**. Foi criado como um item de portfólio para demonstrar proficiência em desenvolvimento *front-end*, manipulação de DOM e **integração com APIs externas em tempo real**.
@@ -58,8 +62,3 @@ Este projeto está sob a **Licença MIT**.
 
 ---
 
-## 🌐 Deploy Ativo
-
-O projeto está hospedado e acessível publicamente no link abaixo 
-
-➡️ **LINK DE ACESSO:** [devlucasabreu-currency-converter.netlify.app](https://devlucasabreu-currency-converter.netlify.app/)
