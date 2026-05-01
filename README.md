@@ -31,7 +31,7 @@ Siga estas instruções para configurar e rodar o projeto em sua máquina:
 
 1.  **Clone o Repositório:**
     ```bash
-    git clone [https://github.com/devlucasabreu/currency-converter.git](https://github.com/devlucasabreu/currency-converter.git)
+    git clone https://github.com/devlucasabreu/currency-converter.git
     cd currency-converter
     ```
 2.  **Abra o Arquivo:**
